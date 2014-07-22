@@ -49,7 +49,7 @@ class PuppetENC(object):
         parser = argparse.ArgumentParser(description='Process some integers.')
         parser.add_argument(
             '--dbfile',
-            default='./db.db',
+            default='./puppet-enc.db',
             help='Name of the sqlite database to use.'
         )
         parser.add_argument(
