@@ -26,6 +26,7 @@ class PuppetENC(object):
 
         # Some variables that will be set later
         self.environment = ''
+        self.site = ''
         self.role = ''
         self.hosttags = ()
 
@@ -39,8 +40,8 @@ class PuppetENC(object):
         # Force foreign keys
         self.db1.execute('PRAGMA foreign_keys = ON;')
 
-        # Get the host environment
-        self.get_host_environment()
+        # Report the classification
+        self.report_classification()
 
     def parseargs(self):
         """
@@ -73,55 +74,50 @@ class PuppetENC(object):
         dbconn = sqlite3.connect(self.dbfile)
         return (dbconn, dbconn.cursor())
 
-    def classify_host(self):
-        """
-        Stub that must be filled in by the subclass
-        This class does the actual classification and returns
-        the yaml to the puppet master.
-        """
-        sys.stderr.write("classify_host() method undefined in subclass.\n")
-        sys.exit(1)
 
     def report_classification(self):
         """
+        Queries the database, and builds a role and environment.
         Constructs and returns the yaml required by puppet
-        """
-        print(
-            yaml.dump(
-                {
-                    'environment': self.environment,
-                    'classes': [self.role]
-                },
-                default_flow_style=False
-            )
-        )
-
-    def get_host_environment(self):
-        """
-        Queries the database for the host environment
         """
         # Check that the host actually exists in the database
         # by getting this environment
         self.db1.execute(
-            "SELECT env_name FROM host_environments where host_name=?",
+            "SELECT"
+            "env_name,"
+            "site_name,"
+            "system_name,"
+            "role_name"
+            "FROM hostoverview where host_name=?",
             (self.hostname,)
         )
 
-        self.environment = self.db1.fetchone()[0]
-        if self.environment == None:
-            sys.stderr.write("Host " + self.hostname + " is not known\n")
-            sys.exit(1)
-
-    def check_single_tag(self, tagname):
-        """
-        Checks the host for a single tag
-        """
-        self.db1.execute(
-            "SELECT count(*) FROM hosttag_mappings WHERE "
-            "    host_name=? "
-            "    AND "
-            "    tag_name=?",
-            (self.hostname, tagname)
-        )
-        return self.db1.fetchone()[0] == 1
+        result = self.db1.fetchone()[0]
+        if result == None:
+            # Return the default unknown host role.
+            # This role should report that it is an unknown host
+            print(
+                yaml.dump(
+                    {
+                        'classes': ['roles::unknown_role']
+                    },
+                    default_flow_style=False
+                )
+            )
+        else:
+            # Read the values
+            (environment, site_name, system_name, role_name) = result
+            print(
+                yaml.dump(
+                    {
+                        'environment': environment,
+                        'classes': [
+                            'roles::' + site_name
+                            + "::" + system_name
+                            + "::"  + role_name
+                        ]
+                    },
+                    default_flow_style=False
+                )
+            )
 
