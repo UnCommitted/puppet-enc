@@ -37,6 +37,7 @@ CREATE INDEX rolenames on roles(name);
 CREATE INDEX systemnames on systems(name);
 CREATE VIEW hostoverview AS
     SELECT hosts.name as host_name,
+           environments.envid as env_id,
            environments.name as env_name,
            sites.name as site_name,
            systems.name as system_name,
