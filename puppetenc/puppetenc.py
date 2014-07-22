@@ -83,16 +83,17 @@ class PuppetENC(object):
         # Check that the host actually exists in the database
         # by getting this environment
         self.db1.execute(
-            "SELECT"
-            "env_name,"
-            "site_name,"
-            "system_name,"
-            "role_name"
-            "FROM hostoverview where host_name=?",
+            "SELECT "
+            "    env_name,"
+            "    site_name,"
+            "    system_name,"
+            "    role_name "
+            "FROM hostoverview "
+            "WHERE host_name=?",
             (self.hostname,)
         )
 
-        result = self.db1.fetchone()[0]
+        result = self.db1.fetchone()
         if result == None:
             # Return the default unknown host role.
             # This role should report that it is an unknown host
