@@ -1,3 +1,4 @@
 *.sw[opqrstuv]
 *.db
+*.pyc
 __pycache__
