@@ -110,9 +110,7 @@ class PuppetENC(object):
             (environment, site_name, system_name, role_name) = result
 
             # Create the actual path to the role
-            role_class = 'roles::' \
-                + system_name \
-                + "::"  + role_name
+            role_class = 'roles::' + role_name
 
             print(
                 yaml.dump(
@@ -123,6 +121,7 @@ class PuppetENC(object):
                         ],
                         'parameters': {
                             'site': site_name,
+                            'system': system_name,
                             'role_class': role_class
                         }
                     },
