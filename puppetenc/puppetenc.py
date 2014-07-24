@@ -113,10 +113,13 @@ class PuppetENC(object):
                     {
                         'environment': environment,
                         'classes': [
-                            'roles::' + site_name
-                            + "::" + system_name
+                            'roles::'
+                            + system_name
                             + "::"  + role_name
-                        ]
+                        ],
+                        'parameters': {
+                            'site': site_name
+                        }
                     },
                     default_flow_style=False
                 )
